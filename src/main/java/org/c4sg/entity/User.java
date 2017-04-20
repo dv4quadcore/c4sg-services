@@ -1,9 +1,8 @@
 package org.c4sg.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
-
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -16,10 +15,6 @@ import org.c4sg.constant.UserStatus;
 import org.c4sg.constant.UserRole;
 import org.c4sg.converter.StatusConverter;
 import org.c4sg.converter.UserRoleConverter;
-import org.hibernate.annotations.Type;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.vividsolutions.jts.geom.Point;
 
 @Entity
 @Table(name = "user")
@@ -62,14 +57,29 @@ public class User implements Serializable {
     @Column(name = "zip")
     private String zip;
     
+    @Column(name = "latitude")
+    private BigDecimal latitude;
+    
+    @Column(name = "longitude")
+    private BigDecimal longitude;
+    
     @Column(name = "introduction")
     private String introduction;
+    
+    @Column(name = "avatar_url")
+    private String avatarUrl;
     
     @Column(name = "linkedin_url")
     private String linkedinUrl;
     
     @Column(name = "personal_url")
     private String personalUrl;   
+    
+	@Column(name="github_url")
+	private String gitHubUrl;
+	
+    @Column(name = "resume_url")
+    private String resumeUrl;
 
     @Convert(converter = UserRoleConverter.class)
     @Column(name = "role", columnDefinition="char(1)", nullable = false)
@@ -92,12 +102,17 @@ public class User implements Serializable {
     private UserStatus status;
      
 	@Column(name = "created_time")
-	@Value("${var.string:#{NULL}}")
 	private Date createdTime;
 		
 	@Column(name = "updated_time")
 	private Date updatedTime;
+	
+	@Column(name = "title")
+	private String title;	
 
+	@Column(name="developer_commit", columnDefinition="int", nullable=true)
+	private Integer developerCommit;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -170,12 +185,20 @@ public class User implements Serializable {
 		this.country = country;
 	}
 
-	public String getZip() {
-		return zip;
+	public BigDecimal getLatitude() {
+		return latitude;
 	}
 
-	public void setZip(String zip) {
-		this.zip = zip;
+	public void setLatitude(BigDecimal latitude) {
+		this.latitude = latitude;
+	}
+	
+	public BigDecimal getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(BigDecimal longitude) {
+		this.longitude = longitude;
 	}
 
 	public String getIntroduction() {
@@ -186,6 +209,14 @@ public class User implements Serializable {
 		this.introduction = introduction;
 	}
 
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
+	}
+	
 	public String getLinkedinUrl() {
 		return linkedinUrl;
 	}
@@ -202,6 +233,14 @@ public class User implements Serializable {
 		this.personalUrl = personalUrl;
 	}
 
+	public String getResumeUrl() {
+		return resumeUrl;
+	}
+
+	public void setResumeUrl(String resumeUrl) {
+		this.resumeUrl = resumeUrl;
+	}
+	
 	public UserRole getRole() {
 		return role;
 	}
@@ -265,6 +304,28 @@ public class User implements Serializable {
 	public void setUpdatedTime(Date updatedTime) {
 		this.updatedTime = updatedTime;
 	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title= title;
+	}
 	
+	public String getGitHubUrl() {
+		return gitHubUrl;
+	}
+
+	public void setGitHubUrl(String gitHubUrl) {
+		this.gitHubUrl = gitHubUrl;
+	}
+	
+	public Integer getDeveloperCommit(){
+		return developerCommit;
+	}
+	public void setDeveloperCommit(Integer developerCommit){
+		this.developerCommit = developerCommit;
+	}
    
 }

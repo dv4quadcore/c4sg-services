@@ -11,14 +11,18 @@ import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.c4sg.dto.UserDTO;
+import org.c4sg.exception.NotFoundException;
 import org.c4sg.service.UserService;
 import org.c4sg.util.FileUploadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,8 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 
 @CrossOrigin(origins = "*")
@@ -48,9 +56,18 @@ public class UserController {
     @CrossOrigin
     @RequestMapping(value = "/active", method = RequestMethod.GET)
     @ApiOperation(value = "Find users, with status applied", notes = "Returns a collection of active users")
-    public List<UserDTO> getActiveUsers() {
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+                value = "Results page you want to retrieve (0..N)"),
+        @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+                value = "Number of records per page."),
+        @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+                value = "Sorting criteria in the format: property(,asc|desc). " +
+                        "Default sort order is ascending. " +
+                        "Multiple sort criteria are supported.")})
+    public Page<UserDTO> getActiveUsers(Pageable pageable) {
         LOGGER.debug("**************All**************");
-        return userService.findActiveUsers();
+        return userService.findActiveUsers(pageable);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -89,9 +106,24 @@ public class UserController {
     }
 
     @RequestMapping(value = "/developers", method = RequestMethod.GET)
-    @ApiOperation(value = "Find developers", notes = "Returns a collection of users")
+    @ApiOperation(value = "Find developers", notes = "Retrieve the users who are c4sg developers and who set their public display to be true. Sort the users by their Github commits in descending order.")
     public List<UserDTO> getDevelopers() {
         return userService.findDevelopers();
+    }
+
+    @CrossOrigin
+    @RequestMapping(value = "/applicant/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Find applicants of a given project", notes = "Returns a collection of projects")
+    @ApiResponses(value = {@ApiResponse(code = 404, message = "Applicants not found")})
+    public ResponseEntity<List<UserDTO>> getApplicants(@ApiParam(value = "ID of project", required = true)
+                                                       @PathVariable("id") Integer projectId) {
+        List<UserDTO> applicants = userService.getApplicants(projectId);
+
+        if (!applicants.isEmpty()) {
+            return ResponseEntity.ok().body(applicants);
+        } else {
+            throw new NotFoundException("Applicants not found");
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -108,10 +140,9 @@ public class UserController {
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     @ApiOperation(value = "Find a user by keyWord", notes = "Returns a collection of users")
-    public List<UserDTO> search(@RequestParam(required = false) String userName,
-                                @RequestParam(required = false) String firstName,
-                                @RequestParam(required = false) String lastName) {
-        return userService.search(userName, firstName, lastName);
+    public List<UserDTO> search(@RequestParam(required = false) String keyWord,
+                                @RequestParam(required = false) List<Integer> skills){
+        return userService.search(keyWord,skills);
     }
     
     @RequestMapping(value = "/{id}/avatar", method = RequestMethod.POST)

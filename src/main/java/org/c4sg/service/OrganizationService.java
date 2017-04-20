@@ -2,8 +2,10 @@ package org.c4sg.service;
 
 import java.util.List;
 
+import org.c4sg.dto.CreateOrganizationDTO;
 import org.c4sg.dto.OrganizationDTO;
 import org.c4sg.dto.ProjectDTO;
+import org.c4sg.entity.Organization;
 
 public interface OrganizationService {
 
@@ -11,9 +13,11 @@ public interface OrganizationService {
     void deleteOrganization(int id);
     String getLogoUploadPath(Integer organizationId);
     OrganizationDTO findById(int id);
-    OrganizationDTO createOrganization(OrganizationDTO organizationDTO);
+    //OrganizationDTO createOrganization(OrganizationDTO organizationDTO);
+    OrganizationDTO createOrganization(CreateOrganizationDTO createOrganizationDTO);
     OrganizationDTO updateOrganization(int id, OrganizationDTO organizationDTO);
     List<OrganizationDTO> findOrganizations();
     List<OrganizationDTO> findByKeyword(String name);
+    List<OrganizationDTO> findByCriteria(String keyWord, String country, boolean open);
     List<OrganizationDTO> findByUser(Integer userId);
 }
